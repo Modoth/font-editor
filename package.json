@@ -1,0 +1,14 @@
+{
+  "name": "font-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "spack.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@modoth/spack": "^0.0.2"
+  }
+}
