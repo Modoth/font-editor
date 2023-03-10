@@ -1,0 +1,206 @@
+<script src="./app.js"></script>
+<script src='https://unpkg.com/opentype.js/dist/opentype.js'></script>
+<template id="app-main" view-model="App">
+  <div class="app">
+    <style inner-html$.="originalFontStyle"></style>
+    <style inner-html$.="editingFontStyle"></style>
+    <div id="cellsPanel" style---original-font$.="originalFont" style---editing-font$.="editingFont">
+      <div class="cellsGrid" style---cell-size$.="cellSize">
+        <div for.="row of cells" class="row">
+          <div for.="cell of row" class="cell-wraper">
+            <div class="cell" class-current.="currentCell === cell" class-preview.="previewing"
+              onclick.="selectCell(cell)">
+              <div if.="cell.glyph?.data" inner-text$.="cell.char || ''">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="editorPanel" style---original-font$.="originalFont" style---editing-font$.="editingFont">
+      <div class="menu menu-top">
+        <input type="file" onchange.="handleFile($event)" />
+        <div if.="font" class="editing-range" onclick.="jumpTo()">
+          <div>
+            <span class="title">Title: </span>
+            <span inner-text$.="font?.names?.en.fullName"></span>
+          </div>
+          <div>
+            <span class="title">Range:</span>
+            <span inner-text$.="startUnicode+'['+startChar+']'"></span>
+            <span>-</span>
+            <span inner-text$.="endUnicode+'['+endChar+']'"></span>
+          </div>
+        </div>
+        <div if.="font">
+          <span class="title">Menu:</span>
+          <span if.="previewing" onclick.="previewing = false">Quit preview</span>
+          <span if.="!previewing" onclick.="previewFont()">Preview</span>
+          <span onclick.="downloadFont()">Download</span>
+        </div>
+        <div if.="font" class="operations">
+          <div class="operation" onclick.="firstPage()">⇤</div>
+          <div class="operation" onclick.="prePage()">⇇</div>
+          <div class="operation" onclick.="nextPage()">⇉</div>
+        </div>
+      </div>
+      <div class="hardwrite-panel">
+        <div if.="font" class="operations">
+          <div class="operation highlight" onclick.="deleteCurrentWord()">྾</div>
+          <div class="operation" class-highlight.="currentChanged" onclick.="resetCurrentWord()">↺</div>
+          <div class="operation" onclick.="preWord()">↤</div>
+          <div class="operation" onclick.="nextWord()">↦</div>
+        </div>
+        <div class="editor-wraper" style---canvas-size$.="canvasSize">
+          <canvas width$.="canvasSize" height$,="canvasSize" id="editorBox"></canvas>
+          <canvas width$.="canvasSize" height$,="canvasSize" id="editorBg"></canvas>
+          <canvas width$.="canvasSize" height$.="canvasSize" id="editorFg"></canvas>
+          <canvas width$.="canvasSize" height$.="canvasSize" id="editorFgTmp"></canvas>
+        </div>
+      </div>
+      <div class="menu menu-bottom">
+
+      </div>
+    </div>
+    <modal-panel id="modal"></modal-panel>
+    <style>
+      :host {
+        display: block;
+        color: #2d2d2d;
+      }
+
+      .app {
+        display: flex;
+        height: calc(100vh - 50px);
+      }
+
+      #cellsPanel {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+      }
+
+      .cellsGrid {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .row {
+        display: flex;
+      }
+
+      .cell-wraper {
+        width: var(--cell-size);
+        height: var(--cell-size);
+        display: flex;
+        padding: 2px;
+        box-sizing: border-box;
+      }
+
+      .cell {
+        border: 1px groove;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        font-family: var(--original-font);
+        color: #2d2d2d;
+      }
+
+      .cell.preview {
+        font-family: var(--editing-font);
+      }
+
+      .current.cell {
+        background: #2d2d2d;
+        color: #fff;
+      }
+
+      .editorPanel {
+        width: 36vh;
+        margin-left: 10px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .editing-range {}
+
+      .hardwrite-panel {
+        display: flex;
+        align-self: center;
+        position: relative;
+      }
+
+      .operations {
+        display: flex;
+        padding: 10px 0;
+      }
+
+      .hardwrite-panel .operations {
+        position: absolute;
+        right: -5px;
+        top: -40;
+      }
+
+      .operation {
+        width: 20px;
+        height: 20px;
+        color: gray;
+        /* background: lightblue; */
+        border-radius: 4px;
+        border: 1px groove;
+        margin: 0 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .operation.highlight {
+        color: lightcoral;
+      }
+
+      .title {
+        font-weight: bold;
+      }
+
+      .editor-wraper {
+        width: var(--canvas-size);
+        height: var(--canvas-size);
+        position: relative;
+        border: 2px groove;
+      }
+
+      canvas {
+        width: var(--canvas-size);
+        height: var(--canvas-size);
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      #editorBg {
+        opacity: 0.15;
+      }
+
+      #editorFgTmp {
+        pointer-events: none;
+      }
+
+      .menu {
+        flex: 1;
+        margin: 10px;
+      }
+    </style>
+  </div>
+</template>
+<script>
+  window.appData = window.appData || /**@imports json */ './app-data.json'
+</script>
+<style>
+  body {
+    background: #f5f5f5;
+  }
+</style>

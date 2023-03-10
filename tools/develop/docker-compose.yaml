@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  main:
+    image: "modoth/udev:latest"
+    stdin_open: true
+    tty: true
+    environment:
+      - "LANG=C.UTF-8"
+      - "TZ=Asia/Shanghai"
+    volumes:
+      - "./libs/main:/home/dev/.commons/main"
+      - "../..:/home/dev/Projects/font-editor"
+    restart: always
+    container_name: font-editor.dev
+    hostname: font-editor.dev
+

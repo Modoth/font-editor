@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "spack.js"
+    "serve": "npx spack serve --watch"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@modoth/spack": "^0.0.2"
+    "@modoth/spack": "^0.0.3"
   }
 }
